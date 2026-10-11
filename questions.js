@@ -58,10 +58,10 @@ const QUESTIONS = [
   {
     id: "kh-07",
     category: "한국사",
-    question: "사도세자의 묘를 수원 화산으로 옮기고, 1796년 수원 화성을 완성한 조선의 왕은?",
+    question: "사도세자의 묘를 화산(지금의 화성시)으로 옮기고, 1796년 수원 화성을 완성한 조선의 왕은?",
     choices: ["영조", "정조", "숙종", "순조"],
     answer: 1,
-    explanation: "수원 화성은 1796년에 축성된 성곽으로, 정조가 사도세자의 묘를 화산으로 옮긴 일과 이어진다.",
+    explanation: "정조는 사도세자의 묘를 화산으로 옮겼고, 수원 화성은 1796년에 축성되었다.",
     source: { name: "한국민족문화대백과사전 「수원 화성」", url: "https://encykorea.aks.ac.kr/Article/E0064671" }
   },
   {
@@ -108,7 +108,7 @@ const QUESTIONS = [
     question: "오스트레일리아의 수도는?",
     choices: ["시드니", "멜버른", "캔버라", "퍼스"],
     answer: 2,
-    explanation: "캔버라는 오스트레일리아 수도 특별 지역에 있으며, 1909년 새 수도의 터로 정해졌다.",
+    explanation: "캔버라는 오스트레일리아 남동부 수도 특별 지역에 있는 연방 수도로, 시드니 남서쪽에 있다.",
     source: { name: "브리태니커 「Canberra」", url: "https://www.britannica.com/place/Canberra" }
   },
   {
@@ -126,7 +126,7 @@ const QUESTIONS = [
     question: "안데스산맥이 있는 대륙은?",
     choices: ["남아메리카", "북아메리카", "아프리카", "오세아니아"],
     answer: 0,
-    explanation: "안데스산맥은 남아메리카 남쪽 끝에서 카리브해 연안까지 약 8,900km 이어진다.",
+    explanation: "안데스산맥은 남아메리카 남쪽 끝에서 북쪽 카리브해 연안까지 끊이지 않고 이어진다.",
     source: { name: "브리태니커 「Andes Mountains」", url: "https://www.britannica.com/place/Andes-Mountains" }
   },
   {
@@ -153,13 +153,13 @@ const QUESTIONS = [
     question: "에베레스트산이 속한 산맥은?",
     choices: ["알프스산맥", "히말라야산맥", "안데스산맥", "로키산맥"],
     answer: 1,
-    explanation: "높이 8,849m인 에베레스트산은 히말라야산맥의 네팔과 중국 국경에 있다.",
+    explanation: "에베레스트산은 히말라야산맥에 있으며, 네팔과 중국의 국경에 솟아 있다.",
     source: { name: "브리태니커 「Mount Everest」", url: "https://www.britannica.com/place/Mount-Everest" }
   },
   {
     id: "wg-08",
     category: "세계지리",
-    question: "브라질에서 나라 전체에 걸쳐 쓰이는 언어는?",
+    question: "브라질 사람들이 주로 쓰는 언어는?",
     choices: ["스페인어", "포르투갈어", "프랑스어", "영어"],
     answer: 1,
     explanation: "브라질에서는 포르투갈어가 나라 전체에서 쓰이며, 여러 원주민 언어도 남아 있다.",
@@ -180,7 +180,7 @@ const QUESTIONS = [
     question: "튀르키예의 수도는?",
     choices: ["이스탄불", "앙카라", "이즈미르", "안탈리아"],
     answer: 1,
-    explanation: "앙카라는 튀르키예 북서부에 있는 수도로, 흑해에서 남쪽으로 약 200km 떨어져 있다.",
+    explanation: "앙카라는 튀르키예의 수도로, 나라의 북서부 내륙에 있으며 흑해의 남쪽에 자리한다.",
     source: { name: "브리태니커 「Ankara」", url: "https://www.britannica.com/place/Ankara" }
   },
 
@@ -191,7 +191,7 @@ const QUESTIONS = [
     question: "원소 기호 Fe로 나타내는 원소는?",
     choices: ["철", "불소", "납", "금"],
     answer: 0,
-    explanation: "철(Fe)은 원자 번호 26인 금속 원소로, 가장 많이 쓰이고 값이 싼 금속이다.",
+    explanation: "철(Fe)은 원자 번호 26인 금속 원소로, 지구 지각의 약 5%를 차지한다.",
     source: { name: "브리태니커 「iron」", url: "https://www.britannica.com/science/iron-chemical-element" }
   },
   {
@@ -216,7 +216,7 @@ const QUESTIONS = [
     id: "sc-04",
     category: "과학",
     question: "제임스 왓슨 등과 함께 DNA의 분자 구조를 밝혀 1962년 노벨상을 받은 영국 과학자는?",
-    choices: ["프랜시스 크릭", "찰스 다윈", "그레고어 멘델", "루이 파스퇴르"],
+    choices: ["프랜시스 크릭", "로절린드 프랭클린", "찰스 다윈", "그레고어 멘델"],
     answer: 0,
     explanation: "크릭은 왓슨, 윌킨스와 함께 DNA 분자 구조를 밝힌 공로로 1962년 노벨상을 받았다.",
     source: { name: "브리태니커 「Francis Crick」", url: "https://www.britannica.com/biography/Francis-Crick" }
@@ -252,7 +252,7 @@ const QUESTIONS = [
     id: "sc-08",
     category: "과학",
     question: "원소를 원자량 순으로 배열해 주기율표를 만들고, 빈칸에 들어갈 원소의 성질까지 예측한 러시아 화학자는?",
-    choices: ["멘델레예프", "라부아지에", "돌턴", "마리 퀴리"],
+    choices: ["멘델레예프", "라부아지에", "돌턴", "퀴리"],
     answer: 0,
     explanation: "멘델레예프는 원소를 원자량 순으로 배열해 주기성을 찾고, 빈칸에 들어갈 원소를 예측했다.",
     source: { name: "브리태니커 「Dmitri Mendeleev」", url: "https://www.britannica.com/biography/Dmitri-Mendeleev" }
@@ -283,7 +283,7 @@ const QUESTIONS = [
     question: "「모나리자」를 그린 화가는?",
     choices: ["레오나르도 다빈치", "미켈란젤로", "라파엘로", "보티첼리"],
     answer: 0,
-    explanation: "「모나리자」는 레오나르도 다빈치가 1503~1519년 무렵 그린 유화로, 루브르 박물관에 있다.",
+    explanation: "「모나리자」는 레오나르도 다빈치가 피렌체에 머물던 때 그린 유화로, 파리 루브르 박물관에 있다.",
     source: { name: "브리태니커 「Mona Lisa」", url: "https://www.britannica.com/topic/Mona-Lisa-painting" }
   },
   {
@@ -308,9 +308,9 @@ const QUESTIONS = [
     id: "ac-04",
     category: "예술과 문화",
     question: "희곡 『로미오와 줄리엣』을 쓴 작가는?",
-    choices: ["괴테", "셰익스피어", "몰리에르", "찰스 디킨스"],
+    choices: ["괴테", "셰익스피어", "몰리에르", "디킨스"],
     answer: 1,
-    explanation: "『로미오와 줄리엣』은 셰익스피어가 1594~1596년 무렵 쓴 희곡으로, 1597년 처음 출판되었다.",
+    explanation: "『로미오와 줄리엣』은 셰익스피어의 희곡으로, 몬터규 집안과 캐풀렛 집안의 젊은 연인 이야기다.",
     source: { name: "브리태니커 「Romeo and Juliet」", url: "https://www.britannica.com/topic/Romeo-and-Juliet" }
   },
   {
@@ -344,7 +344,7 @@ const QUESTIONS = [
     id: "ac-08",
     category: "예술과 문화",
     question: "소설 『돈키호테』를 쓴 작가는?",
-    choices: ["단테", "세르반테스", "빅토르 위고", "톨스토이"],
+    choices: ["단테", "세르반테스", "위고", "톨스토이"],
     answer: 1,
     explanation: "『돈키호테』는 스페인 작가 세르반테스가 1605년과 1615년 두 부분으로 펴낸 소설이다.",
     source: { name: "브리태니커 「Don Quixote」", url: "https://www.britannica.com/topic/Don-Quixote-novel" }
