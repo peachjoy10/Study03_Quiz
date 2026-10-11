@@ -9,6 +9,10 @@ const CATEGORIES = [
   { code: "ac", name: "예술과 문화" }
 ];
 
+const MODES = {
+  practice: { label: "연습", rule: "시간 제한과 힌트 없음, 맞히면 1점", ranked: false }
+};
+
 // ===== 순수 로직 (화면과 무관) =====
 function shuffle(arr, rand) {
   rand = rand || Math.random;
@@ -213,6 +217,101 @@ function runSelfTests(questions) {
 }
 
 // ===== 화면 처리 =====
+const state = {
+  category: null,
+  mode: "practice",
+  items: [],
+  index: 0,
+  score: 0,
+  results: [],
+  answered: false
+};
+
+function startRound(category, mode) {
+  state.category = category;
+  state.mode = mode;
+  state.items = buildRound(QUESTIONS, category);
+  state.index = 0;
+  state.score = 0;
+  state.results = [];
+  showScreen("quiz");
+  renderQuestion();
+}
+
+function renderScore() {
+  $("quiz-score").textContent = "점수 " + state.score;
+}
+
+function renderQuestion() {
+  const item = state.items[state.index];
+  state.answered = false;
+  $("quiz-label").textContent = state.category + " · " + MODES[state.mode].label;
+  $("quiz-progress").textContent = (state.index + 1) + " / " + state.items.length;
+  renderScore();
+  $("quiz-question").textContent = item.question;
+
+  const box = $("quiz-choices");
+  box.innerHTML = "";
+  item.choices.forEach((text, i) => {
+    const b = el("button", "choice", text);
+    b.type = "button";
+    b.addEventListener("click", () => chooseAnswer(i));
+    box.appendChild(b);
+  });
+
+  $("quiz-feedback").hidden = true;
+  $("btn-next").hidden = true;
+}
+
+function chooseAnswer(i) {
+  if (state.answered) return;
+  const item = state.items[state.index];
+  const correct = i === item.answer;
+  const points = scoreAnswer(correct, false);
+  state.score += points;
+  state.results.push({ item: item, chosen: i, correct: correct, usedHint: false, timedOut: false, points: points });
+  finishQuestion(i, correct ? "정답!" : "오답");
+}
+
+function finishQuestion(chosen, verdict) {
+  state.answered = true;
+  const item = state.items[state.index];
+
+  $("quiz-choices").querySelectorAll("button").forEach((b, idx) => {
+    b.disabled = true;
+    if (idx === item.answer) {
+      b.classList.add("correct");
+      b.appendChild(el("span", "tag", "정답"));
+    } else if (idx === chosen) {
+      b.classList.add("wrong");
+      b.appendChild(el("span", "tag", "오답"));
+    }
+  });
+
+  renderScore();
+  const v = $("feedback-verdict");
+  v.textContent = verdict;
+  v.className = "verdict " + (verdict === "정답!" ? "ok" : "ng");
+  $("feedback-explanation").textContent = item.explanation;
+  const a = $("feedback-source");
+  a.href = item.source.url;
+  a.textContent = "출처: " + item.source.name;
+  $("quiz-feedback").hidden = false;
+
+  const last = state.index === state.items.length - 1;
+  $("btn-next").textContent = last ? "결과 보기" : "다음";
+  $("btn-next").hidden = false;
+}
+
+function onNext() {
+  if (state.index < state.items.length - 1) {
+    state.index++;
+    renderQuestion();
+  } else {
+    renderResult();
+  }
+}
+
 function $(id) {
   return document.getElementById(id);
 }
@@ -259,6 +358,7 @@ function onCategory(category) {
 }
 
 function bindButtons() {
+  $("btn-next").addEventListener("click", onNext);
 }
 
 function init() {
