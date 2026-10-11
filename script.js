@@ -10,6 +10,22 @@ const CATEGORIES = [
 ];
 
 // ===== 순수 로직 (화면과 무관) =====
+function shuffle(arr, rand) {
+  rand = rand || Math.random;
+  const out = arr.slice();
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    const t = out[i];
+    out[i] = out[j];
+    out[j] = t;
+  }
+  return out;
+}
+
+function scoreAnswer(correct, usedHint) {
+  if (!correct) return 0;
+  return usedHint ? 0.5 : 1;
+}
 
 // ===== 자체 점검 =====
 function runSelfTests(questions) {
@@ -38,6 +54,21 @@ function runSelfTests(questions) {
   // ---- 점검 도우미: 새 도우미는 이 줄 아래에 더한다 ----
 
   // ---- 점검 항목: 새 항목은 이 줄 아래, "점검 항목 끝" 줄 위에 차례로 더한다 ----
+  check("shuffle: 같은 원소를 모두 담음", () => {
+    const out = shuffle([1, 2, 3, 4, 5], Math.random);
+    return same(out.slice().sort(), [1, 2, 3, 4, 5]);
+  });
+  check("shuffle: 원본 배열을 바꾸지 않음", () => {
+    const arr = [1, 2, 3, 4];
+    shuffle(arr, () => 0);
+    return same(arr, [1, 2, 3, 4]);
+  });
+  check("shuffle: 고정 rand로 결과가 정해짐", () => same(shuffle([1, 2, 3, 4], () => 0), [2, 3, 4, 1]));
+  check("scoreAnswer: 정답 1점, 힌트 정답 0.5점, 오답 0점", () =>
+    scoreAnswer(true, false) === 1 &&
+    scoreAnswer(true, true) === 0.5 &&
+    scoreAnswer(false, false) === 0 &&
+    scoreAnswer(false, true) === 0);
 
   // ---- 점검 항목 끝 ----
 
