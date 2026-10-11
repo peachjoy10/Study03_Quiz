@@ -258,6 +258,7 @@ const state = {
   score: 0,
   results: [],
   answered: false,
+  usedHint: false,
   timerId: null,
   remaining: SPEED_SECONDS
 };
@@ -280,6 +281,11 @@ function renderScore() {
 function renderQuestion() {
   const item = state.items[state.index];
   state.answered = false;
+  state.usedHint = false;
+  const hintBtn = $("btn-hint");
+  hintBtn.hidden = state.mode !== "hint";
+  hintBtn.disabled = false;
+  hintBtn.textContent = "힌트 (오답 2개 지우기)";
   $("quiz-label").textContent = state.category + " · " + MODES[state.mode].label;
   $("quiz-progress").textContent = (state.index + 1) + " / " + state.items.length;
   renderScore();
@@ -304,15 +310,30 @@ function chooseAnswer(i) {
   if (state.answered) return;
   const item = state.items[state.index];
   const correct = i === item.answer;
-  const points = scoreAnswer(correct, false);
+  const points = scoreAnswer(correct, state.usedHint);
   state.score += points;
-  state.results.push({ item: item, chosen: i, correct: correct, usedHint: false, timedOut: false, points: points });
+  state.results.push({ item: item, chosen: i, correct: correct, usedHint: state.usedHint, timedOut: false, points: points });
   finishQuestion(i, correct ? "정답!" : "오답");
+}
+
+function onHint() {
+  if (state.answered || state.usedHint) return;
+  const item = state.items[state.index];
+  const buttons = $("quiz-choices").querySelectorAll("button");
+  pickHintRemovals(item).forEach(i => {
+    buttons[i].disabled = true;
+    buttons[i].classList.add("removed");
+  });
+  state.usedHint = true;
+  const h = $("btn-hint");
+  h.textContent = "힌트 사용함";
+  h.disabled = true;
 }
 
 function finishQuestion(chosen, verdict) {
   stopTimer();
   state.answered = true;
+  $("btn-hint").disabled = true;
   const item = state.items[state.index];
 
   $("quiz-choices").querySelectorAll("button").forEach((b, idx) => {
@@ -470,6 +491,7 @@ function renderModeSelect(category) {
 
 function bindButtons() {
   $("btn-back").addEventListener("click", () => showScreen("start"));
+  $("btn-hint").addEventListener("click", onHint);
   $("btn-next").addEventListener("click", onNext);
   $("btn-again").addEventListener("click", () => startRound(state.category, state.mode));
   $("btn-home").addEventListener("click", () => showScreen("start"));

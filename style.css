@@ -103,3 +103,6 @@ button.secondary { background: #f5ede5; text-align: center; }
 .mode .mode-note { color: #a15c00; font-size: .9rem; }
 
 #quiz-timer.danger { color: #c62828; }
+
+.choice.removed { opacity: .4; text-decoration: line-through; }
+#btn-hint { text-align: center; }
