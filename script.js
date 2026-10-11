@@ -213,10 +213,60 @@ function runSelfTests(questions) {
 }
 
 // ===== 화면 처리 =====
-function init() {
-  if (new URLSearchParams(location.search).has("test")) {
-    runSelfTests(typeof QUESTIONS !== "undefined" ? QUESTIONS : null);
+function $(id) {
+  return document.getElementById(id);
+}
+
+function el(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+function showScreen(name) {
+  document.querySelectorAll(".screen").forEach(s => {
+    s.hidden = s.id !== "screen-" + name;
+  });
+  window.scrollTo(0, 0);
+}
+
+function renderStart(errors) {
+  const box = $("category-buttons");
+  box.innerHTML = "";
+  CATEGORIES.forEach(c => {
+    const b = el("button", "", c.name);
+    b.type = "button";
+    b.disabled = errors.length > 0;
+    b.addEventListener("click", () => onCategory(c.name));
+    box.appendChild(b);
+  });
+
+  const errBox = $("data-error");
+  errBox.innerHTML = "";
+  errBox.hidden = errors.length === 0;
+  if (errors.length > 0) {
+    errBox.appendChild(el("strong", "", "문항 데이터 오류"));
+    const ul = el("ul");
+    errors.forEach(e => ul.appendChild(el("li", "", e)));
+    errBox.appendChild(ul);
   }
+}
+
+// 1단계에는 모드 선택이 없으므로 곧바로 연습 모드로 시작한다. 2단계(태스크 10)에서 모드 선택으로 바꾼다.
+function onCategory(category) {
+  startRound(category, "practice");
+}
+
+function bindButtons() {
+}
+
+function init() {
+  const questions = typeof QUESTIONS !== "undefined" ? QUESTIONS : null;
+  renderStart(validateQuestions(questions));
+  bindButtons();
+  showScreen("start");
+  if (new URLSearchParams(location.search).has("test")) runSelfTests(questions);
 }
 
 // ===== 시작 코드 =====
