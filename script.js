@@ -57,64 +57,6 @@ function wrongItems(results) {
   return results.filter(r => !r.correct).map(r => r.item);
 }
 
-function insertRecord(board, record) {
-  // Array.prototype.sort는 안정 정렬이므로 동점이면 먼저 있던 기록이 위에 남는다.
-  return board.concat([record]).sort((a, b) => b.score - a.score).slice(0, 5);
-}
-
-function isRecord(r) {
-  return r !== null && typeof r === "object" &&
-    typeof r.name === "string" && r.name !== "" &&
-    typeof r.score === "number" && isFinite(r.score) &&
-    typeof r.date === "string";
-}
-
-function getStorage() {
-  try {
-    const s = window.localStorage;
-    const t = "quizA.check";
-    s.setItem(t, t);
-    s.removeItem(t);
-    return s;
-  } catch (e) {
-    return null;
-  }
-}
-
-function loadBoard(key, storage) {
-  const s = storage || getStorage();
-  if (!s) return [];
-  try {
-    const raw = s.getItem(key);
-    if (raw === null) return [];
-    const data = JSON.parse(raw);
-    if (!Array.isArray(data) || !data.every(isRecord)) return [];
-    return data.slice(0, 5);
-  } catch (e) {
-    return [];
-  }
-}
-
-function saveBoard(key, board, storage) {
-  const s = storage || getStorage();
-  if (!s) return false;
-  try {
-    s.setItem(key, JSON.stringify(board));
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-
-function boardKey(mode, category) {
-  const c = CATEGORIES.find(x => x.name === category);
-  return "quizA.board." + mode + "." + c.code;
-}
-
-function todayString(d) {
-  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
-}
-
 function buildRound(questions, category, rand) {
   const pool = questions.filter(q => q.category === category);
   return shuffle(pool, rand).slice(0, 10).map(q => shuffleItem(q, rand));
@@ -214,14 +156,6 @@ function runSelfTests(questions) {
     return out;
   }
 
-  function fakeStorage(init) {
-    const data = Object.assign({}, init);
-    return {
-      getItem: k => (Object.prototype.hasOwnProperty.call(data, k) ? data[k] : null),
-      setItem: (k, v) => { data[k] = String(v); }
-    };
-  }
-
   // ---- 점검 항목: 새 항목은 이 줄 아래, "점검 항목 끝" 줄 위에 차례로 더한다 ----
   check("shuffle: 같은 원소를 모두 담음", () => {
     const out = shuffle([1, 2, 3, 4, 5], Math.random);
@@ -308,47 +242,6 @@ function runSelfTests(questions) {
     return same(wrongItems(results).map(it => it.id), ["kh-02", "kh-03"]);
   });
   check("wrongItems: 다 맞히면 빈 배열", () => wrongItems([{ item: { id: "kh-01" }, correct: true }]).length === 0);
-  check("insertRecord: 점수가 높은 순으로 정렬", () => {
-    const board = insertRecord([{ name: "가", score: 5, date: "2026-10-01" }], { name: "나", score: 8, date: "2026-10-02" });
-    return same(board.map(r => r.name), ["나", "가"]);
-  });
-  check("insertRecord: 동점이면 먼저 세운 기록이 위", () => {
-    const board = [{ name: "가", score: 7, date: "2026-10-01" }, { name: "나", score: 5, date: "2026-10-01" }];
-    return same(insertRecord(board, { name: "다", score: 7, date: "2026-10-02" }).map(r => r.name), ["가", "다", "나"]);
-  });
-  check("insertRecord: 상위 5건만 남김", () => {
-    const board = [9, 8, 7, 6, 5].map((s, i) => ({ name: "n" + i, score: s, date: "2026-10-01" }));
-    const low = insertRecord(board, { name: "low", score: 4, date: "2026-10-02" });
-    const high = insertRecord(board, { name: "high", score: 10, date: "2026-10-02" });
-    return low.length === 5 && low.every(r => r.name !== "low") &&
-      high.length === 5 && high[0].name === "high" && high.every(r => r.score !== 5);
-  });
-  check("insertRecord: 원본 순위표를 바꾸지 않음", () => {
-    const board = [{ name: "가", score: 5, date: "2026-10-01" }];
-    insertRecord(board, { name: "나", score: 9, date: "2026-10-02" });
-    return board.length === 1 && board[0].name === "가";
-  });
-  check("loadBoard: 깨진 JSON이면 빈 순위표", () => same(loadBoard("k", fakeStorage({ k: "{깨진" })), []));
-  check("loadBoard: 형식이 틀린 값이면 빈 순위표", () =>
-    same(loadBoard("k", fakeStorage({ k: JSON.stringify([{ name: "가" }]) })), []) &&
-    same(loadBoard("k", fakeStorage({ k: JSON.stringify("문자열") })), []));
-  check("loadBoard: 없는 키는 빈 순위표", () => same(loadBoard("없음", fakeStorage({})), []));
-  check("saveBoard·loadBoard: 저장한 값을 그대로 읽음", () => {
-    const s = fakeStorage({});
-    const board = [{ name: "가", score: 9.5, date: "2026-10-11" }];
-    return saveBoard("k", board, s) === true && same(loadBoard("k", s), board);
-  });
-  check("저장소 오류: saveBoard는 false, loadBoard는 빈 순위표", () => {
-    const broken = {
-      getItem: () => { throw new Error("막힘"); },
-      setItem: () => { throw new Error("막힘"); }
-    };
-    return saveBoard("k", [], broken) === false && same(loadBoard("k", broken), []);
-  });
-  check("boardKey·todayString: 키와 날짜 형식", () =>
-    boardKey("speed", "한국사") === "quizA.board.speed.kh" &&
-    boardKey("hint", "예술과 문화") === "quizA.board.hint.ac" &&
-    todayString(new Date(2026, 9, 1)) === "2026-10-01");
 
   // ---- 점검 항목 끝 ----
 
@@ -369,7 +262,6 @@ const state = {
   retry: false,
   firstResults: [],
   firstScore: 0,
-  saved: false,
   timerId: null,
   remaining: SPEED_SECONDS
 };
@@ -556,53 +448,7 @@ function renderResult() {
   }
 
   $("btn-retry").hidden = !(state.mode === "practice" && wrongItems(state.results).length > 0);
-  renderRanking();
   showScreen("result");
-}
-
-function renderRanking() {
-  const box = $("ranking");
-  box.hidden = !MODES[state.mode].ranked;
-  if (box.hidden) return;
-
-  state.saved = false;
-  const canStore = getStorage() !== null;
-  $("ranking-name").value = "";
-  $("ranking-name").disabled = !canStore;
-  $("btn-save").disabled = !canStore;
-  $("ranking-message").textContent = canStore ? "" : "기록을 저장할 수 없음";
-  $("ranking-title").textContent = state.category + " · " + MODES[state.mode].label + " 순위표";
-  renderBoard(loadBoard(boardKey(state.mode, state.category)));
-}
-
-function renderBoard(board) {
-  const list = $("ranking-list");
-  list.innerHTML = "";
-  if (board.length === 0) {
-    list.appendChild(el("li", "empty", "아직 기록이 없습니다."));
-    return;
-  }
-  board.forEach(r => list.appendChild(el("li", "", r.name + " · " + r.score + "점 · " + r.date)));
-}
-
-function onSave() {
-  if (state.saved) return;
-  const name = $("ranking-name").value.trim();
-  if (name === "") {
-    $("ranking-message").textContent = "이름을 입력하세요";
-    return;
-  }
-  const key = boardKey(state.mode, state.category);
-  const board = insertRecord(loadBoard(key), { name: name, score: state.firstScore, date: todayString(new Date()) });
-  if (!saveBoard(key, board)) {
-    $("ranking-message").textContent = "기록을 저장할 수 없음";
-    return;
-  }
-  state.saved = true;
-  $("ranking-name").disabled = true;
-  $("btn-save").disabled = true;
-  $("ranking-message").textContent = "기록을 저장했습니다";
-  renderBoard(board);
 }
 
 function $(id) {
@@ -672,10 +518,6 @@ function bindButtons() {
   $("btn-back").addEventListener("click", () => showScreen("start"));
   $("btn-hint").addEventListener("click", onHint);
   $("btn-retry").addEventListener("click", startRetry);
-  $("btn-save").addEventListener("click", onSave);
-  $("ranking-name").addEventListener("keydown", e => {
-    if (e.key === "Enter") onSave();
-  });
   $("btn-next").addEventListener("click", onNext);
   $("btn-again").addEventListener("click", () => startRound(state.category, state.mode));
   $("btn-home").addEventListener("click", () => showScreen("start"));
