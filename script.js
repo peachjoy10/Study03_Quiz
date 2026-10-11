@@ -27,6 +27,24 @@ function scoreAnswer(correct, usedHint) {
   return usedHint ? 0.5 : 1;
 }
 
+function shuffleItem(item, rand) {
+  const order = shuffle([0, 1, 2, 3], rand);
+  return {
+    id: item.id,
+    category: item.category,
+    question: item.question,
+    choices: order.map(i => item.choices[i]),
+    answer: order.indexOf(item.answer),
+    explanation: item.explanation,
+    source: item.source
+  };
+}
+
+function buildRound(questions, category, rand) {
+  const pool = questions.filter(q => q.category === category);
+  return shuffle(pool, rand).slice(0, 10).map(q => shuffleItem(q, rand));
+}
+
 function validateQuestions(questions) {
   if (!Array.isArray(questions)) return ["문항 데이터가 배열이 아닙니다."];
   const errors = [];
@@ -162,6 +180,25 @@ function runSelfTests(questions) {
     const qs = makeValidSet();
     qs[2].source = { name: "출처", url: "" };
     return validateQuestions(qs).indexOf("kh-03: 출처 이름과 URL이 필요합니다.") !== -1;
+  });
+  check("buildRound: 고른 카테고리 문항 10개", () => {
+    const round = buildRound(makeValidSet(), "과학", Math.random);
+    return round.length === 10 && round.every(it => it.category === "과학");
+  });
+  check("buildRound: 보기를 섞어도 answer가 같은 정답을 가리킴", () => {
+    const qs = makeValidSet();
+    const round = buildRound(qs, "한국사", () => 0);
+    const ok = round.every(it => {
+      const orig = qs.find(q => q.id === it.id);
+      return it.choices[it.answer] === orig.choices[orig.answer];
+    });
+    return ok && round.some(it => it.answer !== 0);
+  });
+  check("buildRound: 원본 문항을 바꾸지 않음", () => {
+    const qs = makeValidSet();
+    const before = JSON.stringify(qs);
+    buildRound(qs, "세계지리", Math.random);
+    return JSON.stringify(qs) === before;
   });
 
   // ---- 점검 항목 끝 ----
