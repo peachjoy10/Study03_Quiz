@@ -1,0 +1,60 @@
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  line-height: 1.5;
+  color: #1f2328;
+  background: #f6f7f9;
+}
+.student { padding: 8px 16px; background: #1f2d3d; color: #fff; font-weight: 700; text-align: center; }
+main { max-width: 640px; margin: 0 auto; padding: 16px; }
+h1 { margin: 8px 0 16px; font-size: 1.6rem; }
+h2 { margin: 0 0 12px; font-size: 1.25rem; }
+p, li, a { overflow-wrap: anywhere; word-break: keep-all; }
+
+button {
+  font: inherit;
+  width: 100%;
+  margin: 0 0 8px;
+  padding: 12px 14px;
+  border: 1px solid #c8ccd2;
+  border-radius: 8px;
+  background: #fff;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+  word-break: keep-all;
+}
+button:hover:not(:disabled) { border-color: #3b6fd6; }
+button:disabled { cursor: default; }
+button.secondary { background: #eef0f3; text-align: center; }
+
+.note { color: #5b6470; font-size: .95rem; }
+.error { margin-bottom: 12px; padding: 12px; border: 1px solid #d33; border-radius: 8px; background: #fdecec; color: #a11; }
+
+.status { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-bottom: 12px; font-weight: 700; }
+.question { font-size: 1.15rem; font-weight: 700; }
+.choice:disabled { opacity: 1; color: inherit; }
+.choice.correct { border-color: #1e7d32; background: #e6f4ea; }
+.choice.wrong { border-color: #c62828; background: #fdecec; }
+.tag { margin-left: 8px; font-size: .9rem; font-weight: 700; }
+.correct .tag { color: #1e7d32; }
+.wrong .tag { color: #c62828; }
+
+.feedback { margin: 12px 0; padding: 12px; border: 1px solid #e1e4e8; border-radius: 8px; background: #fff; }
+.verdict { margin: 0 0 4px; font-weight: 700; }
+.verdict.ok { color: #1e7d32; }
+.verdict.ng { color: #c62828; }
+.feedback a { color: #3b6fd6; }
+#btn-next { background: #3b6fd6; border-color: #3b6fd6; color: #fff; text-align: center; }
+
+.big { margin: 0; font-size: 2rem; font-weight: 700; }
+.result-list { padding-left: 1.4em; }
+.result-list li { margin-bottom: 10px; }
+.result-list p { margin: 0; }
+.result-list .q { font-weight: 700; }
+.result-list .ok p:last-child { color: #1e7d32; }
+.result-list .ng p:last-child { color: #c62828; }
