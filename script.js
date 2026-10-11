@@ -312,6 +312,29 @@ function onNext() {
   }
 }
 
+function resultLabel(r) {
+  if (r.correct && r.usedHint) return "정답 (힌트 0.5점)";
+  if (r.correct) return "정답";
+  if (r.timedOut) return "시간 초과";
+  return "오답";
+}
+
+function renderResult() {
+  $("result-score").textContent = state.score + " / " + state.results.length;
+  $("result-note").hidden = MODES[state.mode].ranked;
+
+  const list = $("result-list");
+  list.innerHTML = "";
+  state.results.forEach(r => {
+    const li = el("li", r.correct ? "ok" : "ng");
+    li.appendChild(el("p", "q", r.item.question));
+    li.appendChild(el("p", "", resultLabel(r) + " · 정답: " + r.item.choices[r.item.answer]));
+    list.appendChild(li);
+  });
+
+  showScreen("result");
+}
+
 function $(id) {
   return document.getElementById(id);
 }
@@ -359,6 +382,8 @@ function onCategory(category) {
 
 function bindButtons() {
   $("btn-next").addEventListener("click", onNext);
+  $("btn-again").addEventListener("click", () => startRound(state.category, state.mode));
+  $("btn-home").addEventListener("click", () => showScreen("start"));
 }
 
 function init() {
