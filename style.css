@@ -98,11 +98,25 @@ button.secondary { background: #f5ede5; text-align: center; }
 .result-list .ok p:last-child { color: var(--mint); }
 .result-list .ng p:last-child { color: var(--coral); }
 
-.mode strong, .mode .rule, .mode .mode-note { display: block; }
+.mode strong, .mode .rule { display: block; }
+.mode strong { color: var(--accent); font-size: 1.1rem; }
 .mode .rule { font-size: .95rem; }
-.mode .mode-note { color: #a15c00; font-size: .9rem; }
+.mode .mode-note {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: #8a3d29;
+  font-size: .85rem;
+}
 
-#quiz-timer.danger { color: #c62828; }
+#quiz-timer.danger { background: var(--coral-soft); color: var(--coral); }
 
-.choice.removed { opacity: .4; text-decoration: line-through; }
-#btn-hint { text-align: center; }
+.choice.removed { opacity: .45; text-decoration: line-through; border-style: dashed; background: #f5ede5; }
+#btn-hint { border-color: #6cc39c; background: var(--mint-soft); color: var(--mint); font-weight: 700; text-align: center; }
+#btn-hint:hover:not(:disabled) { border-color: var(--mint); background: #d3efe1; }
+#btn-hint:disabled { border-color: var(--line); background: #f5ede5; color: var(--muted); }
+
+#screen-result .button-list button { text-align: center; }
+#btn-retry { border-color: #f2a98f; background: var(--accent-soft); color: #8a3d29; font-weight: 700; }
