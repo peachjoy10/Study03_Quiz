@@ -10,7 +10,9 @@ const CATEGORIES = [
 ];
 
 const MODES = {
-  practice: { label: "연습", rule: "시간 제한과 힌트 없음, 맞히면 1점", ranked: false }
+  practice: { label: "연습", rule: "시간 제한과 힌트 없음, 맞히면 1점", ranked: false },
+  speed: { label: "스피드", rule: "문항마다 15초, 시간이 지나면 오답", ranked: true },
+  hint: { label: "힌트", rule: "문항마다 힌트 1번, 힌트를 쓰고 맞히면 0.5점", ranked: true }
 };
 
 // ===== 순수 로직 (화면과 무관) =====
@@ -404,12 +406,30 @@ function renderStart(errors) {
   }
 }
 
-// 1단계에는 모드 선택이 없으므로 곧바로 연습 모드로 시작한다. 2단계(태스크 10)에서 모드 선택으로 바꾼다.
 function onCategory(category) {
-  startRound(category, "practice");
+  renderModeSelect(category);
+}
+
+function renderModeSelect(category) {
+  state.category = category;
+  $("mode-title").textContent = category + " · 모드를 고르세요";
+  const box = $("mode-buttons");
+  box.innerHTML = "";
+  Object.keys(MODES).forEach(key => {
+    const m = MODES[key];
+    const b = el("button", "mode");
+    b.type = "button";
+    b.appendChild(el("strong", "", m.label));
+    b.appendChild(el("span", "rule", m.rule));
+    if (!m.ranked) b.appendChild(el("span", "mode-note", "순위표에 기록되지 않음"));
+    b.addEventListener("click", () => startRound(category, key));
+    box.appendChild(b);
+  });
+  showScreen("mode");
 }
 
 function bindButtons() {
+  $("btn-back").addEventListener("click", () => showScreen("start"));
   $("btn-next").addEventListener("click", onNext);
   $("btn-again").addEventListener("click", () => startRound(state.category, state.mode));
   $("btn-home").addEventListener("click", () => showScreen("start"));
