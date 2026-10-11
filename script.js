@@ -369,6 +369,7 @@ const state = {
   retry: false,
   firstResults: [],
   firstScore: 0,
+  saved: false,
   timerId: null,
   remaining: SPEED_SECONDS
 };
@@ -555,7 +556,53 @@ function renderResult() {
   }
 
   $("btn-retry").hidden = !(state.mode === "practice" && wrongItems(state.results).length > 0);
+  renderRanking();
   showScreen("result");
+}
+
+function renderRanking() {
+  const box = $("ranking");
+  box.hidden = !MODES[state.mode].ranked;
+  if (box.hidden) return;
+
+  state.saved = false;
+  const canStore = getStorage() !== null;
+  $("ranking-name").value = "";
+  $("ranking-name").disabled = !canStore;
+  $("btn-save").disabled = !canStore;
+  $("ranking-message").textContent = canStore ? "" : "기록을 저장할 수 없음";
+  $("ranking-title").textContent = state.category + " · " + MODES[state.mode].label + " 순위표";
+  renderBoard(loadBoard(boardKey(state.mode, state.category)));
+}
+
+function renderBoard(board) {
+  const list = $("ranking-list");
+  list.innerHTML = "";
+  if (board.length === 0) {
+    list.appendChild(el("li", "empty", "아직 기록이 없습니다."));
+    return;
+  }
+  board.forEach(r => list.appendChild(el("li", "", r.name + " · " + r.score + "점 · " + r.date)));
+}
+
+function onSave() {
+  if (state.saved) return;
+  const name = $("ranking-name").value.trim();
+  if (name === "") {
+    $("ranking-message").textContent = "이름을 입력하세요";
+    return;
+  }
+  const key = boardKey(state.mode, state.category);
+  const board = insertRecord(loadBoard(key), { name: name, score: state.firstScore, date: todayString(new Date()) });
+  if (!saveBoard(key, board)) {
+    $("ranking-message").textContent = "기록을 저장할 수 없음";
+    return;
+  }
+  state.saved = true;
+  $("ranking-name").disabled = true;
+  $("btn-save").disabled = true;
+  $("ranking-message").textContent = "기록을 저장했습니다";
+  renderBoard(board);
 }
 
 function $(id) {
@@ -625,6 +672,10 @@ function bindButtons() {
   $("btn-back").addEventListener("click", () => showScreen("start"));
   $("btn-hint").addEventListener("click", onHint);
   $("btn-retry").addEventListener("click", startRetry);
+  $("btn-save").addEventListener("click", onSave);
+  $("ranking-name").addEventListener("keydown", e => {
+    if (e.key === "Enter") onSave();
+  });
   $("btn-next").addEventListener("click", onNext);
   $("btn-again").addEventListener("click", () => startRound(state.category, state.mode));
   $("btn-home").addEventListener("click", () => showScreen("start"));

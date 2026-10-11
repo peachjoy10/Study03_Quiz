@@ -48,6 +48,15 @@
       <p id="result-note" class="note" hidden>순위표에 기록되지 않음</p>
       <ol id="result-list" class="result-list"></ol>
       <p id="result-retry" class="note" hidden></p>
+      <div id="ranking" class="ranking" hidden>
+        <div class="save-row">
+          <input id="ranking-name" type="text" maxlength="12" placeholder="이름" aria-label="이름">
+          <button id="btn-save" type="button">기록 저장</button>
+        </div>
+        <p id="ranking-message" class="note"></p>
+        <h3 id="ranking-title"></h3>
+        <ol id="ranking-list"></ol>
+      </div>
       <div class="button-list">
         <button id="btn-retry" type="button" hidden>틀린 문제 다시 풀기</button>
         <button id="btn-again" type="button">같은 모드 다시</button>

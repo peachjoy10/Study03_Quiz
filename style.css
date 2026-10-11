@@ -106,3 +106,10 @@ button.secondary { background: #f5ede5; text-align: center; }
 
 .choice.removed { opacity: .4; text-decoration: line-through; }
 #btn-hint { text-align: center; }
+
+.ranking { margin: 16px 0; padding: 12px; border: 1px solid #e1e4e8; border-radius: 8px; background: #fff; }
+.save-row { display: flex; gap: 8px; }
+.save-row input { flex: 1; min-width: 0; padding: 10px; border: 1px solid #c8ccd2; border-radius: 8px; font: inherit; }
+.save-row button { width: auto; margin: 0; text-align: center; white-space: nowrap; }
+.ranking h3 { margin: 8px 0; font-size: 1.05rem; }
+#ranking-list .empty { list-style: none; color: #5b6470; }
