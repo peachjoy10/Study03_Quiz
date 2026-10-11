@@ -15,6 +15,8 @@ const MODES = {
   hint: { label: "힌트", rule: "문항마다 힌트 1번, 힌트를 쓰고 맞히면 0.5점", ranked: true }
 };
 
+const SPEED_SECONDS = 15;
+
 // ===== 순수 로직 (화면과 무관) =====
 function shuffle(arr, rand) {
   rand = rand || Math.random;
@@ -255,7 +257,9 @@ const state = {
   index: 0,
   score: 0,
   results: [],
-  answered: false
+  answered: false,
+  timerId: null,
+  remaining: SPEED_SECONDS
 };
 
 function startRound(category, mode) {
@@ -292,6 +296,8 @@ function renderQuestion() {
 
   $("quiz-feedback").hidden = true;
   $("btn-next").hidden = true;
+  if (state.mode === "speed") startTimer();
+  else $("quiz-timer").hidden = true;
 }
 
 function chooseAnswer(i) {
@@ -305,6 +311,7 @@ function chooseAnswer(i) {
 }
 
 function finishQuestion(chosen, verdict) {
+  stopTimer();
   state.answered = true;
   const item = state.items[state.index];
 
@@ -332,6 +339,38 @@ function finishQuestion(chosen, verdict) {
   const last = state.index === state.items.length - 1;
   $("btn-next").textContent = last ? "결과 보기" : "다음";
   $("btn-next").hidden = false;
+}
+
+function startTimer() {
+  stopTimer();
+  state.remaining = SPEED_SECONDS;
+  renderTimer();
+  state.timerId = setInterval(() => {
+    state.remaining--;
+    renderTimer();
+    if (state.remaining <= 0) onTimeout();
+  }, 1000);
+}
+
+function stopTimer() {
+  if (state.timerId !== null) {
+    clearInterval(state.timerId);
+    state.timerId = null;
+  }
+}
+
+function renderTimer() {
+  const t = $("quiz-timer");
+  t.hidden = false;
+  t.textContent = "남은 시간 " + state.remaining + "초";
+  t.classList.toggle("danger", state.remaining <= 5);
+}
+
+function onTimeout() {
+  if (state.answered) return;
+  const item = state.items[state.index];
+  state.results.push({ item: item, chosen: null, correct: false, usedHint: false, timedOut: true, points: 0 });
+  finishQuestion(null, "시간 초과");
 }
 
 function onNext() {
@@ -378,6 +417,7 @@ function el(tag, className, text) {
 }
 
 function showScreen(name) {
+  stopTimer();
   document.querySelectorAll(".screen").forEach(s => {
     s.hidden = s.id !== "screen-" + name;
   });

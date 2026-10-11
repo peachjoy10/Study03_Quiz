@@ -101,3 +101,5 @@ button.secondary { background: #f5ede5; text-align: center; }
 .mode strong, .mode .rule, .mode .mode-note { display: block; }
 .mode .rule { font-size: .95rem; }
 .mode .mode-note { color: #a15c00; font-size: .9rem; }
+
+#quiz-timer.danger { color: #c62828; }
