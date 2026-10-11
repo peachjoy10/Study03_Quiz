@@ -259,6 +259,9 @@ const state = {
   results: [],
   answered: false,
   usedHint: false,
+  retry: false,
+  firstResults: [],
+  firstScore: 0,
   timerId: null,
   remaining: SPEED_SECONDS
 };
@@ -270,12 +273,22 @@ function startRound(category, mode) {
   state.index = 0;
   state.score = 0;
   state.results = [];
+  state.retry = false;
+  showScreen("quiz");
+  renderQuestion();
+}
+
+function startRetry() {
+  state.items = shuffle(wrongItems(state.results)).map(it => shuffleItem(it));
+  state.index = 0;
+  state.results = [];
+  state.retry = true;
   showScreen("quiz");
   renderQuestion();
 }
 
 function renderScore() {
-  $("quiz-score").textContent = "점수 " + state.score;
+  $("quiz-score").textContent = state.retry ? "다시 풀기 · 채점 안 함" : "점수 " + state.score;
 }
 
 function renderQuestion() {
@@ -310,7 +323,7 @@ function chooseAnswer(i) {
   if (state.answered) return;
   const item = state.items[state.index];
   const correct = i === item.answer;
-  const points = scoreAnswer(correct, state.usedHint);
+  const points = state.retry ? 0 : scoreAnswer(correct, state.usedHint);
   state.score += points;
   state.results.push({ item: item, chosen: i, correct: correct, usedHint: state.usedHint, timedOut: false, points: points });
   finishQuestion(i, correct ? "정답!" : "오답");
@@ -411,18 +424,30 @@ function resultLabel(r) {
 }
 
 function renderResult() {
-  $("result-score").textContent = state.score + " / " + state.results.length;
+  if (!state.retry) {
+    state.firstResults = state.results;
+    state.firstScore = state.score;
+  }
+  $("result-score").textContent = state.firstScore + " / " + state.firstResults.length;
   $("result-note").hidden = MODES[state.mode].ranked;
 
   const list = $("result-list");
   list.innerHTML = "";
-  state.results.forEach(r => {
+  state.firstResults.forEach(r => {
     const li = el("li", r.correct ? "ok" : "ng");
     li.appendChild(el("p", "q", r.item.question));
     li.appendChild(el("p", "", resultLabel(r) + " · 정답: " + r.item.choices[r.item.answer]));
     list.appendChild(li);
   });
 
+  const info = $("result-retry");
+  info.hidden = !state.retry;
+  if (state.retry) {
+    const ok = state.results.filter(r => r.correct).length;
+    info.textContent = "틀린 문제 다시 풀기: " + state.results.length + "문항 중 " + ok + "문항 맞힘 (점수에 반영하지 않음)";
+  }
+
+  $("btn-retry").hidden = !(state.mode === "practice" && wrongItems(state.results).length > 0);
   showScreen("result");
 }
 
@@ -492,6 +517,7 @@ function renderModeSelect(category) {
 function bindButtons() {
   $("btn-back").addEventListener("click", () => showScreen("start"));
   $("btn-hint").addEventListener("click", onHint);
+  $("btn-retry").addEventListener("click", startRetry);
   $("btn-next").addEventListener("click", onNext);
   $("btn-again").addEventListener("click", () => startRound(state.category, state.mode));
   $("btn-home").addEventListener("click", () => showScreen("start"));
