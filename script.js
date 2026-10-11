@@ -200,6 +200,11 @@ function runSelfTests(questions) {
     buildRound(qs, "세계지리", Math.random);
     return JSON.stringify(qs) === before;
   });
+  check("실제 문항 데이터: validateQuestions 통과", () => {
+    const errors = validateQuestions(questions);
+    errors.forEach(e => console.log("  " + e));
+    return errors.length === 0;
+  });
 
   // ---- 점검 항목 끝 ----
 
