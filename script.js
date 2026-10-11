@@ -44,6 +44,15 @@ function shuffleItem(item, rand) {
   };
 }
 
+function pickHintRemovals(item, rand) {
+  const wrong = [0, 1, 2, 3].filter(i => i !== item.answer);
+  return shuffle(wrong, rand).slice(0, 2);
+}
+
+function wrongItems(results) {
+  return results.filter(r => !r.correct).map(r => r.item);
+}
+
 function buildRound(questions, category, rand) {
   const pool = questions.filter(q => q.category === category);
   return shuffle(pool, rand).slice(0, 10).map(q => shuffleItem(q, rand));
@@ -209,6 +218,26 @@ function runSelfTests(questions) {
     errors.forEach(e => console.log("  " + e));
     return errors.length === 0;
   });
+  check("pickHintRemovals: 정답이 아닌 서로 다른 보기 2개를 고름", () => {
+    for (let ans = 0; ans < 4; ans++) {
+      for (let k = 0; k < 20; k++) {
+        const r = pickHintRemovals({ answer: ans }, Math.random);
+        if (r.length !== 2 || r[0] === r[1] || r.indexOf(ans) !== -1) return false;
+        if (r.some(i => !Number.isInteger(i) || i < 0 || i > 3)) return false;
+      }
+    }
+    return true;
+  });
+  check("pickHintRemovals: 고정 rand로 결과가 정해짐", () => same(pickHintRemovals({ answer: 1 }, () => 0), [2, 3]));
+  check("wrongItems: 틀린 문항만 순서대로 돌려줌", () => {
+    const results = [
+      { item: { id: "kh-01" }, correct: true },
+      { item: { id: "kh-02" }, correct: false },
+      { item: { id: "kh-03" }, correct: false }
+    ];
+    return same(wrongItems(results).map(it => it.id), ["kh-02", "kh-03"]);
+  });
+  check("wrongItems: 다 맞히면 빈 배열", () => wrongItems([{ item: { id: "kh-01" }, correct: true }]).length === 0);
 
   // ---- 점검 항목 끝 ----
 
